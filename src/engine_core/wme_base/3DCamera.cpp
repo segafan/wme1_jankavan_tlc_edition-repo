@@ -29,6 +29,12 @@ C3DCamera::~C3DCamera()
 }
 
 
+void C3DCamera::SetFOV(float fov)
+{
+	m_FOV = fov;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 HRESULT C3DCamera::GetViewMatrix(D3DXMATRIX *ViewMatrix)
 {

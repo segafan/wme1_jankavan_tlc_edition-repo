@@ -55,6 +55,8 @@ CAdObject::CAdObject(CBGame* inGame):CBObject(inGame)
 	m_PartOffsetX = m_PartOffsetY = 0;
 
 	m_RegisterAlias = this;
+
+	m_ForceZValue = 0;
 }
 
 
@@ -748,6 +750,7 @@ HRESULT CAdObject::ScSetProperty(char *Name, CScValue *Value)
 		m_SubtitlesWidth = Value->GetInt();
 		return S_OK;
 	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// SubtitlesPosRelative

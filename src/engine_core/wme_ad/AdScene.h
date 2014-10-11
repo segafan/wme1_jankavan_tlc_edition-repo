@@ -65,6 +65,7 @@ public:
 	HRESULT DisplayRegionContent(CAdRegion* Region=NULL, bool Display3DOnly=false);
 	HRESULT DisplayRegionContentOld(CAdRegion* Region=NULL);
 	static int CompareObjs(const void* Obj1, const void* Obj2);
+	static int CompareZOrders(const void* Obj1, const void* Obj2);
 
 	HRESULT UpdateFreeObjects();
 	HRESULT CAdScene::TraverseNodes(bool Update=false);

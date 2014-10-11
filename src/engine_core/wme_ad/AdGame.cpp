@@ -1191,7 +1191,7 @@ HRESULT CAdGame::ShowCursor()
 			if(!m_SmartItemCursor || m_ActiveObject->CanHandleEvent(m_SelectedItem->m_Name))
 				return DrawCursor(m_SelectedItem->m_CursorHover);
 			else
-				return DrawCursor(m_SelectedItem->m_CursorNormal);
+				return DrawCursor(m_SelectedItem->m_CursorNormal);	
 		}
 		else return DrawCursor(m_SelectedItem->m_CursorNormal);
 	}
@@ -1416,6 +1416,7 @@ HRESULT CAdGame::Persist(CBPersistMgr *PersistMgr)
 	}
 	else if(!PersistMgr->m_Saving) m_VideoSkipButton = VIDEO_SKIP_LEFT;
 
+
 	
 
 
@@ -1446,7 +1447,8 @@ void CAdGame::AfterLoadScene(void* Scene, void* Data)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
+////	
+//////////////////////////////////////////////////////////////////////
 void CAdGame::SetPrevSceneName(char *Name)
 {
 	SAFE_DELETE_ARRAY(m_PrevSceneName);

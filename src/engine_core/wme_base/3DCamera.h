@@ -18,6 +18,8 @@ public:
 	void Move(float Speed);
 	void RotateView(float X, float Y, float Z);
 	void SetupPos(D3DXVECTOR3 Pos, D3DXVECTOR3 Target, float Bank=0);
+	void SetFOV(float fov);
+
 	HRESULT GetViewMatrix(D3DXMATRIX* ViewMatrix);
 	C3DCamera(CBGame* inGame);
 	virtual ~C3DCamera();
