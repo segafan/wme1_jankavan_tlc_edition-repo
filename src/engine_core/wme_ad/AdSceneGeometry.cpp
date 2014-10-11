@@ -1771,8 +1771,16 @@ bool CAdSceneGeometry::Convert3Dto2D(D3DXVECTOR3* Pos, int* X, int* Y)
 
 	D3DXVECTOR3 Vect2D;
 	D3DXVec3Project(&Vect2D, Pos, &m_DrawingViewport, &m_LastProjMat, &m_LastViewMat, &worldMat);
-	*X = Vect2D.x + m_LastScrollX;
-	*Y = Vect2D.y + m_LastScrollY;
+
+	CBRenderD3D* m_Renderer = (CBRenderD3D*)Game->m_Renderer;
+
+	// m_Renderer->GetVi
+
+	*X = Vect2D.x + Game->m_OffsetX - Game->m_Renderer->m_DrawOffsetX + m_LastScrollX;
+	*Y = Vect2D.y + Game->m_OffsetY - Game->m_Renderer->m_DrawOffsetY + m_LastScrollY;
+
+	/**X = Vect2D.x + m_LastScrollX;
+	*Y = Vect2D.y + m_LastScrollY;*/
 
 	return true;
 }

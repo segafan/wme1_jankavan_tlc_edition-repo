@@ -95,6 +95,7 @@ public:
 	int m_PosY;
 	int m_PosX;
 	bool m_SaveState;
+	int m_ForceZValue;
 
 	// base
 	virtual HRESULT Update()  { return E_FAIL; };

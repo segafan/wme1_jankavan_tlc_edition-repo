@@ -1180,13 +1180,24 @@ HRESULT CAdScene::TraverseNodes(bool Update)
 			}
 		}
 
+
+		if (m_Layers[j]->m_IsSortable)	
+			qsort(m_Layers[j]->m_Nodes.GetData(), m_Layers[j]->m_Nodes.GetSize(), sizeof(CAdSceneNode*), CAdScene::CompareZOrders);
+
 		// for each node
 		for(k=0; k<m_Layers[j]->m_Nodes.GetSize(); k++)
 		{
 			CAdSceneNode* Node = m_Layers[j]->m_Nodes[k];
+			char* name;
+
 			switch(Node->m_Type)
 			{
 				case OBJECT_ENTITY:
+
+					if (Node->m_Entity->m_ForceZValue > 0)
+					{
+							name = Node->m_Entity->m_Name;
+					}
 					if(Node->m_Entity->m_Active && (Game->m_EditorMode || !Node->m_Entity->m_EditorOnly))
 					{
 						if(Node->m_Entity->m_Is3D) Game->m_Renderer->Setup3D();
@@ -1195,8 +1206,10 @@ HRESULT CAdScene::TraverseNodes(bool Update)
 						// only display 3D if geometry is set
 						if(!Node->m_Entity->m_Is3D || m_Geom)
 						{
+
 							if(Update) Node->m_Entity->Update();
-							else Node->m_Entity->Display();
+							else 
+								Node->m_Entity->Display();
 						}
 					}
 					break;
@@ -1452,6 +1465,35 @@ int CAdScene::CompareObjs(const void* Obj1, const void* Obj2)
 }
 
 //////////////////////////////////////////////////////////////////////////
+int CAdScene::CompareZOrders(const void* Obj1, const void* Obj2)
+{
+	CAdSceneNode* Object1 = *(CAdSceneNode**)Obj1;
+	CAdSceneNode* Object2 = *(CAdSceneNode**)Obj2;
+
+	int val1 = 0;
+	int val2 = 0;
+	
+	if (Object1->m_Entity != NULL)
+	{
+		
+		if (Object1->m_Type == OBJECT_ENTITY)
+			if (Object1->m_Entity->m_ForceZValue != NULL)
+				val1 = Object1->m_Entity->m_ForceZValue;
+		
+		if (Object2->m_Type == OBJECT_ENTITY)
+			if (Object2->m_Entity->m_ForceZValue != NULL)
+				val2 = Object2->m_Entity->m_ForceZValue;
+	}
+	
+
+
+	if(val1 < val2) return -1;
+	else if(val1 > val2) return 1;
+	else return 0;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 HRESULT CAdScene::DisplayRegionContentOld(CAdRegion *Region)
 {
 	CAdGame* AdGame = (CAdGame*)Game;
@@ -1609,6 +1651,21 @@ HRESULT CAdScene::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *Thi
 	//////////////////////////////////////////////////////////////////////////
 	// LoadActor3D
 	//////////////////////////////////////////////////////////////////////////
+	else if(strcmp(Name, "SetCurrentFOV")==0)
+	{
+		Stack->CorrectParams(1);
+
+		CScValue* Val = Stack->Pop();
+
+		if(m_Geom->m_ActiveCamera >= 0)
+		{
+			m_Geom->GetActiveCamera()->SetFOV(Val->GetFloat());
+		}
+		
+		Stack->PushNULL();
+
+		return S_OK;
+	}
 	else if(strcmp(Name, "LoadActor3D")==0)
 	{
 		Stack->CorrectParams(1);

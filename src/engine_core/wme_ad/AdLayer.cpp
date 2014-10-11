@@ -16,6 +16,7 @@ CAdLayer::CAdLayer(CBGame* inGame):CBObject(inGame)
 	m_Width = m_Height = 0;
 	m_Active = true;
 	m_CloseUp = false;
+	m_IsSortable = false;
 }
 
 
@@ -360,6 +361,12 @@ CScValue* CAdLayer::ScGetProperty(char *Name)
 		return m_ScValue;
 	}
 
+
+	if(strcmp(Name, "Sortable")==0){
+		m_ScValue->SetBool(m_IsSortable);
+		return m_ScValue;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// NumNodes (RO)
 	//////////////////////////////////////////////////////////////////////////
@@ -428,6 +435,11 @@ HRESULT CAdLayer::ScSetProperty(char *Name, CScValue *Value)
 	//////////////////////////////////////////////////////////////////////////
 	else if(strcmp(Name, "CloseUp")==0){
 		m_CloseUp = Value->GetBool();
+		return S_OK;
+	}
+
+	else if(strcmp(Name, "Sortable")==0){
+		m_IsSortable = Value->GetBool();
 		return S_OK;
 	}
 
@@ -528,6 +540,7 @@ HRESULT CAdLayer::Persist(CBPersistMgr* PersistMgr){
 	PersistMgr->Transfer(TMEMBER(m_Main));
 	m_Nodes.Persist(PersistMgr);
 	PersistMgr->Transfer(TMEMBER(m_Width));
+	PersistMgr->Transfer(TMEMBER(m_IsSortable));
 
 	return S_OK;
 }

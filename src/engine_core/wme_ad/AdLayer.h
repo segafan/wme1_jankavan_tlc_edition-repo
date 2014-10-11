@@ -17,6 +17,7 @@ public:
 	bool m_CloseUp;
 	DECLARE_PERSISTENT(CAdLayer, CBObject);
 	bool m_Active;
+	bool m_IsSortable;
 	int m_Height;
 	int m_Width;
 	bool m_Main;

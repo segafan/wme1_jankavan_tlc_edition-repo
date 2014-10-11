@@ -67,6 +67,7 @@ public:
 	CAdWaypointGroup* m_CurrentWptGroup;
 	CAdInventory* GetInventory();
 
+
 	virtual HRESULT SaveAsText(CBDynBuffer *Buffer, int Indent);
 	
 	virtual HRESULT AfterMove();
