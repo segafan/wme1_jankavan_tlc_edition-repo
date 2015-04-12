@@ -1310,6 +1310,28 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
 
 		return S_OK;
 	}
+	//////////////////////////////////////////////////////////////////////////
+	// Swap music channels
+	//////////////////////////////////////////////////////////////////////////
+	else if(strcmp(Name, "SwapMusicChannels")==0)
+	{
+		Stack->CorrectParams(2);
+		int Channel1 = Stack->Pop()->GetInt(0);
+		int Channel2 = Stack->Pop()->GetInt(0);
+
+		if(m_MusicCrossfadeRunning)
+		{
+			Script->RuntimeError("Game.SwapMusicChannels: Music crossfade is in progress.");
+			Stack->PushBool(false);
+			return S_OK;
+		}
+
+		SwapMusicChannels(Channel1,Channel2);	
+
+		Stack->PushBool(true);
+		return S_OK;
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// MusicCrossfade
@@ -1336,6 +1358,24 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
 		m_MusicCrossfadeSwap = Swap;
 
 		m_MusicCrossfadeRunning = true;
+
+		Stack->PushBool(true);
+		return S_OK;
+	}
+	else if(strcmp(Name, "StopMusicCrossfade")==0)
+	{
+		Stack->CorrectParams(0);
+
+		if(!m_MusicCrossfadeRunning)
+		{
+			Stack->PushBool(false);
+			return S_OK;
+		}
+
+		if (m_MusicCrossfadeSwap)
+			SwapMusicChannels(m_MusicCrossfadeChannel1,m_MusicCrossfadeChannel2);
+		
+		m_MusicCrossfadeRunning = false;
 
 		Stack->PushBool(true);
 		return S_OK;
