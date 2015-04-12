@@ -764,6 +764,7 @@ void CBRenderD3D::TransformVertices(struct SPRITEVERTEX* vertices, const D3DXVEC
 }
 
 
+
 //////////////////////////////////////////////////////////////////////////
 HRESULT CBRenderD3D::SetProjection()
 {

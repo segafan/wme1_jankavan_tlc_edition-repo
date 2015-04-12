@@ -322,6 +322,7 @@ public:
 	HRESULT DisplayQuickMsg();
 	DWORD m_Fps;
 	HRESULT UpdateMusicCrossfade();
+	HRESULT SwapMusicChannels(int chan1, int chan2);
 
 	bool IsVideoPlaying();
 	HRESULT StopVideo();
