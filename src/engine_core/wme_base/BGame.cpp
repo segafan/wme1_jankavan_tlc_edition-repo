@@ -1360,7 +1360,15 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
 		Stack->PushInt(Length);
 		return S_OK;
 	}
-
+	//////////////////////////////
+	//Query if music crossfade is in progress
+	//////////////////////////////
+	else if(strcmp(Name, "IsMusicCrossfading")==0)
+	{
+		Stack->CorrectParams(0);
+		Stack->PushBool(m_MusicCrossfadeRunning);
+		return S_OK;
+	}
 	//////////////////////////////////////////////////////////////////////////
 	// SetMousePos
 	//////////////////////////////////////////////////////////////////////////
@@ -2976,7 +2984,7 @@ HRESULT CBGame::DisplayQuickMsg()
 		}
 	}
 
-	int PosY=20;
+	int PosY=20;	
 
 	// display
 	for(i=0; i<m_QuickMessages.GetSize(); i++)
@@ -4576,6 +4584,20 @@ HRESULT CBGame::DisplayIndicator()
 	return S_OK;
 }
 
+
+HRESULT CBGame::SwapMusicChannels(int chan1, int chan2)
+{
+			CBSound* Dummy = m_Music[chan1];
+			int DummyInt = m_MusicStartTime[chan1];
+			
+			m_Music[m_MusicCrossfadeChannel1] = m_Music[chan2];
+			m_MusicStartTime[m_MusicCrossfadeChannel1] = m_MusicStartTime[chan2];
+			
+			m_Music[chan1] = Dummy;
+			m_MusicStartTime[chan2] = DummyInt;
+			return S_OK;
+}
+
 //////////////////////////////////////////////////////////////////////////
 HRESULT CBGame::UpdateMusicCrossfade()
 {
@@ -4614,14 +4636,7 @@ HRESULT CBGame::UpdateMusicCrossfade()
 		if(m_MusicCrossfadeSwap)
 		{
 			// swap channels
-			CBSound* Dummy = m_Music[m_MusicCrossfadeChannel1];
-			int DummyInt = m_MusicStartTime[m_MusicCrossfadeChannel1];
-			
-			m_Music[m_MusicCrossfadeChannel1] = m_Music[m_MusicCrossfadeChannel2];
-			m_MusicStartTime[m_MusicCrossfadeChannel1] = m_MusicStartTime[m_MusicCrossfadeChannel2];
-			
-			m_Music[m_MusicCrossfadeChannel2] = Dummy;
-			m_MusicStartTime[m_MusicCrossfadeChannel2] = DummyInt;
+			SwapMusicChannels(m_MusicCrossfadeChannel1,m_MusicCrossfadeChannel2);
 		}
 	}
 	else
