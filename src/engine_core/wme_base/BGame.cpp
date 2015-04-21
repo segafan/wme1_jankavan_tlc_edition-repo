@@ -171,6 +171,8 @@ CBGame::CBGame():CBObject(this)
 	m_MusicCrossfadeChannel1 = -1;
 	m_MusicCrossfadeChannel2 = -1;
 	m_MusicCrossfadeSwap = false;
+	m_MusicCrossfadeTargetVolume = 100;
+	m_MusicCrossfadeSourceVolume = 100;
 
 	m_LoadImageName = NULL;
 	m_SaveImageName = NULL;
@@ -1338,25 +1340,35 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
 	//////////////////////////////////////////////////////////////////////////
 	else if(strcmp(Name, "MusicCrossfade")==0)
 	{
-		Stack->CorrectParams(4);
+		if(m_MusicCrossfadeRunning)
+		{
+			if (m_MusicCrossfadeSwap)
+				SwapMusicChannels(m_MusicCrossfadeChannel1,m_MusicCrossfadeChannel2);
+			
+			m_MusicCrossfadeRunning = false;
+
+		}
+
+
+		Stack->CorrectParams(5);
 		int Channel1 = Stack->Pop()->GetInt(0);
 		int Channel2 = Stack->Pop()->GetInt(0);
 		DWORD FadeLength = (DWORD)Stack->Pop()->GetInt(0);
 		bool Swap = Stack->Pop()->GetBool(true);
+		int TargetVolume = Stack->Pop()->GetInt(100);
 
-		if(m_MusicCrossfadeRunning)
-		{
-			Script->RuntimeError("Game.MusicCrossfade: Music crossfade is already in progress.");
-			Stack->PushBool(false);
-			return S_OK;
-		}
+		m_MusicCrossfadeSourceVolume = 0;
+
+		if (m_Music[Channel1] != NULL)	
+			m_MusicCrossfadeSourceVolume = m_Music[Channel1]->GetVolume();
 
 		m_MusicCrossfadeStartTime = m_LiveTimer;
 		m_MusicCrossfadeChannel1 = Channel1;
 		m_MusicCrossfadeChannel2 = Channel2;
 		m_MusicCrossfadeLength = FadeLength;
 		m_MusicCrossfadeSwap = Swap;
-
+		m_MusicCrossfadeTargetVolume = TargetVolume;
+		
 		m_MusicCrossfadeRunning = true;
 
 		Stack->PushBool(true);
@@ -4045,6 +4057,8 @@ HRESULT CBGame::Persist(CBPersistMgr *PersistMgr)
 	PersistMgr->Transfer(TMEMBER(m_MusicCrossfadeChannel1));
 	PersistMgr->Transfer(TMEMBER(m_MusicCrossfadeChannel2));
 	PersistMgr->Transfer(TMEMBER(m_MusicCrossfadeSwap));
+	PersistMgr->Transfer(TMEMBER(m_MusicCrossfadeSourceVolume));
+	PersistMgr->Transfer(TMEMBER(m_MusicCrossfadeTargetVolume));
 
 	PersistMgr->Transfer(TMEMBER(m_LoadImageName));
 	PersistMgr->Transfer(TMEMBER(m_SaveImageName));
@@ -4666,11 +4680,11 @@ HRESULT CBGame::UpdateMusicCrossfade()
 	{
 		m_MusicCrossfadeRunning = false;
 		//m_Music[m_MusicCrossfadeChannel2]->SetVolume(GlobMusicVol);
-		m_Music[m_MusicCrossfadeChannel2]->SetVolume(100);
+		m_Music[m_MusicCrossfadeChannel2]->SetVolume(m_MusicCrossfadeTargetVolume);
 		
 		m_Music[m_MusicCrossfadeChannel1]->Stop();
 		//m_Music[m_MusicCrossfadeChannel1]->SetVolume(GlobMusicVol);
-		m_Music[m_MusicCrossfadeChannel1]->SetVolume(100);
+		m_Music[m_MusicCrossfadeChannel1]->SetVolume(m_MusicCrossfadeTargetVolume);
 		
 
 		if(m_MusicCrossfadeSwap)
@@ -4681,12 +4695,12 @@ HRESULT CBGame::UpdateMusicCrossfade()
 	}
 	else
 	{
-		//m_Music[m_MusicCrossfadeChannel1]->SetVolume(GlobMusicVol - (float)CurrentTime / (float)m_MusicCrossfadeLength * GlobMusicVol);
-		//m_Music[m_MusicCrossfadeChannel2]->SetVolume((float)CurrentTime / (float)m_MusicCrossfadeLength * GlobMusicVol);
-		m_Music[m_MusicCrossfadeChannel1]->SetVolume(100 - (float)CurrentTime / (float)m_MusicCrossfadeLength * 100);
-		m_Music[m_MusicCrossfadeChannel2]->SetVolume((float)CurrentTime / (float)m_MusicCrossfadeLength * 100);
+		float clampTime = (float)CurrentTime / (float)m_MusicCrossfadeLength;
+		if (clampTime > 1) clampTime = 1;
 
-		//Game->QuickMessageForm("%d %d", m_Music[m_MusicCrossfadeChannel1]->GetVolume(), m_Music[m_MusicCrossfadeChannel2]->GetVolume());
+		m_Music[m_MusicCrossfadeChannel1]->SetVolume(m_MusicCrossfadeSourceVolume - m_MusicCrossfadeSourceVolume * clampTime);
+		m_Music[m_MusicCrossfadeChannel2]->SetVolume(clampTime * m_MusicCrossfadeTargetVolume);
+
 	}
 
 	return S_OK;
