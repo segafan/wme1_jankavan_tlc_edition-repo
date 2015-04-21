@@ -289,6 +289,9 @@ public:
 	DWORD m_MusicCrossfadeLength;
 	int m_MusicCrossfadeChannel1;
 	int m_MusicCrossfadeChannel2;
+	int m_MusicCrossfadeSourceVolume;
+	int m_MusicCrossfadeTargetVolume;
+
 	HRESULT DisplayWindows(bool InGame=false);
 	CBRegistry* m_Registry;
 	bool m_UseD3D;
