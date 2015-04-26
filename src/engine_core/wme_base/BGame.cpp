@@ -1330,6 +1330,7 @@ HRESULT CBGame::ScCallMethod(CScScript* Script, CScStack *Stack, CScStack *ThisS
 
 		SwapMusicChannels(Channel1,Channel2);	
 
+
 		Stack->PushBool(true);
 		return S_OK;
 	}
@@ -4644,10 +4645,10 @@ HRESULT CBGame::SwapMusicChannels(int chan1, int chan2)
 			CBSound* Dummy = m_Music[chan1];
 			int DummyInt = m_MusicStartTime[chan1];
 			
-			m_Music[m_MusicCrossfadeChannel1] = m_Music[chan2];
-			m_MusicStartTime[m_MusicCrossfadeChannel1] = m_MusicStartTime[chan2];
+			m_Music[chan1] = m_Music[chan2];
+			m_MusicStartTime[chan1] = m_MusicStartTime[chan2];
 			
-			m_Music[chan1] = Dummy;
+			m_Music[chan2] = Dummy;
 			m_MusicStartTime[chan2] = DummyInt;
 			return S_OK;
 }
